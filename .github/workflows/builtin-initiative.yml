@@ -1,0 +1,89 @@
+name: deploy azure policy and initiative
+
+on:
+  push:
+    paths:
+      - 'initiatives/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-policy:
+    runs-on: windows-latest
+    env:
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+       
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+
+      - name: login to azure with azure login action
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+
+      - name: deploy policy and initiative
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            # Deploy individual policies
+            $policyFolders = Get-ChildItem -Directory -Path "./initiatives"
+            # Loop thru the folders and pick the respective json files
+            foreach ($folder in $policyFolders) {
+            if ($folder.Name -ne "initiativeDefinition.json") {
+              $policyName = $folder.Name
+              $policyJsonPath = "$folder/policyDefinition.json"
+            #Import policy definition file
+              $policyContent = Get-Content -Path $policyJsonPath -Raw
+              $policyContent = $policyContent.Trim()
+              $policyDefinition = $policyContent | ConvertFrom-Json
+            # Map variables to specific properties and convert them to strings
+              $displayName = $policyDefinition.properties.displayName.ToString()
+              $policyRule = $policyDefinition.properties.policyRule | ConvertTo-Json -Compress -Depth 10
+              $parameters = $policyDefinition.properties.parameters | ConvertTo-Json -Compress -Depth 10
+              $description = $policyDefinition.properties.description.ToString()
+              $mode = $policyDefinition.properties.mode.ToString()
+              $policyDefinitionId = "/subscriptions/$env:AZURE_SUBSCRIPTION_ID/providers/Microsoft.Authorization/policyDefinitions/$policyName"
+              Write-Output "Deploying policy definition: $policyName"
+
+              New-AzPolicyDefinition `
+                -Name $policyName `
+                -Policy $policyRule `
+                -Description $description `
+                -DisplayName $displayName `
+                -Mode $policyDefinition.mode `
+                -SubscriptionId $env:AZURE_SUBSCRIPTION_ID
+            }
+            }
+
+            # Deploy the initiative
+            $initiativePath = "./initiatives/initiativeDefinition.json"
+            # Import initiatie definition file
+            $initiativeContent = Get-Content -Path $initiativePath -Raw
+            $initiativeContent = $initiativeContent.Trim()
+            $initiativeDefinition = $initiativeContent | ConvertFrom-Json        
+            # Map variables to specific initiative properties and convert them
+            $initiativeName = "epac-Audit-Storage-accounts"
+            $policyDefinition = $initiativeDefinition.properties.policyDefinitions | ConvertTo-Json -Compress -Depth 10
+            $descripton = $initiativeDefinition.properties.description.ToString()
+            $displayName = $initiativeDefinition.properties.displayName.ToString()
+            $initiativeId = "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07/providers/Microsoft.Authorization/policySetDefinitions/$initiativeName"
+    
+            Write-Output "Deploying initiative: $initiativeName"
+            New-AzPolicySetDefinition `
+              -Name $initiativeName `
+              -PolicyDefinition $policyDefinition `
+              -Description $description `
+              -DisplayName $displayName `
+              -SubscriptionId f147463c-0679-4251-8f65-6e4b481e4f07
+
+            # Get Initiative definition detials
+            $initiative = Get-AzPolicySetDefinition -Name $displayName
+
+            # Assign the initiative
+            Write-Output "Assigning initiative: $initiativeName"
+            New-AzPolicyAssignment `
+              -Name "${initiativeName}-assignment" `
+              -PolicyDefinition $initiative `
+              -Scope "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07"
