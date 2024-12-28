@@ -1,6 +1,6 @@
 {
     "properties": {
-      "displayName": "epac-Key-Vault-Initiative",
+      "displayName": "epac-Audit-KeyVault",
       "description": "An initiative to audit key vault.",
       "policyDefinitions": [
         {
