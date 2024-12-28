@@ -1,0 +1,23 @@
+{
+    "properties": {
+      "displayName": "epac-Key-Vault-Initiative",
+      "description": "An initiative to audit key vault.",
+      "policyDefinitions": [
+        {
+          "policyDefinitionId": "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07/providers/Microsoft.Authorization/policyDefinitions/1e66c121-a66a-4b1f-9b83-0fd99bf0fc2d"
+        },
+        {
+          "policyDefinitionId": "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07/providers/Microsoft.Authorization/policyDefinitions/0b60c0b2-2dc2-4e1c-b5c9-abbed971de53"
+        },
+        {
+          "policyDefinitionId": "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07/providers/Microsoft.Authorization/policyDefinitions/98728c90-32c7-4049-8429-847dc0f4fe37"
+        },
+        {
+            "policyDefinitionId": "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07//providers/Microsoft.Authorization/policyDefinitions/152b15f7-8e1f-4c1f-ab71-8c010ba5dbc0"
+          }
+      ],
+      "parameters": {},
+      "policyType": "Custom"
+    }
+  }
+  
