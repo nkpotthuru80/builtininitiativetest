@@ -14,6 +14,12 @@
         },
         {
             "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/152b15f7-8e1f-4c1f-ab71-8c010ba5dbc0"
+          },
+          {
+            "policyDefinitionId": "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07/providers/Microsoft.Authorization/policyDefinitions/epac-Storage-account-keys-should-not-be-expired"
+          },
+          {
+            "policyDefinitionId": "/subscriptions/f147463c-0679-4251-8f65-6e4b481e4f07/providers/Microsoft.Authorization/policyDefinitions/epac-Storage-accounts-specified-TLS-version"
           }
       ],
       "parameters": {},
