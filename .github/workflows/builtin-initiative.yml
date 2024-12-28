@@ -3,7 +3,7 @@ name: deploy azure policy and initiative
 on:
   push:
     paths:
-      - 'initiatives/**'
+      - 'Keyvaultinitiative/**'
   workflow_dispatch:
 
 jobs:
