@@ -27,44 +27,15 @@ jobs:
         with:
           azPSVersion: "latest"
           inlineScript: |
-            # Deploy individual policies
-            $policyFolders = Get-ChildItem -Directory -Path "./initiatives"
-            # Loop thru the folders and pick the respective json files
-            foreach ($folder in $policyFolders) {
-            if ($folder.Name -ne "initiativeDefinition.json") {
-              $policyName = $folder.Name
-              $policyJsonPath = "$folder/policyDefinition.json"
-            #Import policy definition file
-              $policyContent = Get-Content -Path $policyJsonPath -Raw
-              $policyContent = $policyContent.Trim()
-              $policyDefinition = $policyContent | ConvertFrom-Json
-            # Map variables to specific properties and convert them to strings
-              $displayName = $policyDefinition.properties.displayName.ToString()
-              $policyRule = $policyDefinition.properties.policyRule | ConvertTo-Json -Compress -Depth 10
-              $parameters = $policyDefinition.properties.parameters | ConvertTo-Json -Compress -Depth 10
-              $description = $policyDefinition.properties.description.ToString()
-              $mode = $policyDefinition.properties.mode.ToString()
-              $policyDefinitionId = "/subscriptions/$env:AZURE_SUBSCRIPTION_ID/providers/Microsoft.Authorization/policyDefinitions/$policyName"
-              Write-Output "Deploying policy definition: $policyName"
-
-              New-AzPolicyDefinition `
-                -Name $policyName `
-                -Policy $policyRule `
-                -Description $description `
-                -DisplayName $displayName `
-                -Mode $policyDefinition.mode `
-                -SubscriptionId $env:AZURE_SUBSCRIPTION_ID
-            }
-            }
-
+           
             # Deploy the initiative
-            $initiativePath = "./initiatives/initiativeDefinition.json"
+            $initiativePath = "./Keyvaultinitiative/initiative.json"
             # Import initiatie definition file
             $initiativeContent = Get-Content -Path $initiativePath -Raw
             $initiativeContent = $initiativeContent.Trim()
             $initiativeDefinition = $initiativeContent | ConvertFrom-Json        
             # Map variables to specific initiative properties and convert them
-            $initiativeName = "epac-Audit-Storage-accounts"
+            $initiativeName = "epac-Audit-KeyVault"
             $policyDefinition = $initiativeDefinition.properties.policyDefinitions | ConvertTo-Json -Compress -Depth 10
             $descripton = $initiativeDefinition.properties.description.ToString()
             $displayName = $initiativeDefinition.properties.displayName.ToString()
